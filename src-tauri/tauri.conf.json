@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ChoiceVoice",
+  "version": "0.1.0",
+  "identifier": "com.choicevoice.app",
+  "build": {
+    "frontendDist": "../ui-vite/dist",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeDevCommand": "npm --prefix ../ui-vite run dev",
+    "beforeBuildCommand": "npm --prefix ../ui-vite run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "ChoiceVoice",
+        "width": 1280,
+        "height": 820,
+        "resizable": true,
+        "fullscreen": false,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPDATA/library/**",
+          "$HOME/Library/Application Support/com.choicevoice.app/library/**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "resources/sidecar/choicevoice-tts"
+    ],
+    "resources": {
+      "resources/sidecar/": "./"
+    }
+  }
+}

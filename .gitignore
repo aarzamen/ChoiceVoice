@@ -1,0 +1,23 @@
+# Rust build artifacts
+src-tauri/target/
+src-tauri/gen/
+
+# Node
+ui-vite/node_modules/
+ui-vite/dist/
+ui-vite/.vite/
+
+# Python sidecar venv + caches
+sidecar/.venv/
+sidecar/**/__pycache__/
+sidecar/*.egg-info/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Environment / logs
+*.log
+.env
+.env.local

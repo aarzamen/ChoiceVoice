@@ -1,0 +1,51 @@
+html, body {
+  margin: 0; padding: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, #2a2620 0%, #14110d 60%, #0a0807 100%);
+  min-height: 100vh;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #ddd;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(80,55,30,0.06) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0 1px, transparent 1px 5px);
+  pointer-events: none;
+  z-index: 0;
+}
+#root { position: relative; z-index: 1; }
+.screw {
+  width: 14px; height: 14px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #f6f6f8 0%, #b8babd 35%, #6c6e72 75%, #3a3c40 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.2);
+  position: relative;
+}
+.screw::after {
+  content: ""; position: absolute; inset: 4px;
+  background: linear-gradient(45deg, transparent 44%, #2a2c30 44% 56%, transparent 56%);
+  border-radius: 2px;
+}
+.library-drawer {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: 340px;
+  background: linear-gradient(180deg, #1a1b1d 0%, #0a0a0b 100%);
+  border-left: 1px solid #2a2c30;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.7);
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+.library-drawer.open { transform: translateX(0); }
+.library-entry {
+  padding: 10px 14px;
+  border-bottom: 1px solid #1a1b1d;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.library-entry:hover { background: rgba(255,255,255,0.04); }
+.library-entry.playing { background: rgba(76,255,90,0.06); }

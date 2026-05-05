@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ChoiceVoice TTS sidecar wrapper — v0.1
+# Tauri appends the target-triple suffix; this is the aarch64-apple-darwin variant.
+set -euo pipefail
+
+# Locate sidecar/ dir relative to this script (works both in dev and bundled)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# In dev: resources/sidecar/ lives inside src-tauri/resources/sidecar/
+# In bundled .app: Tauri copies externalBin next to the app binary
+# Walk up to find the sidecar/ Python project
+for candidate in \
+    "$SCRIPT_DIR/../../../sidecar" \
+    "$SCRIPT_DIR/../../sidecar" \
+    "$SCRIPT_DIR/../sidecar" \
+    "$SCRIPT_DIR/sidecar"
+do
+    if [ -d "$candidate/choicevoice_tts" ]; then
+        SIDECAR_DIR="$(cd "$candidate" && pwd)"
+        break
+    fi
+done
+
+if [ -z "${SIDECAR_DIR:-}" ]; then
+    echo '{"event":"error","stage":"wrapper","message":"Cannot locate choicevoice_tts package"}' >&1
+    exit 1
+fi
+
+cd "$SIDECAR_DIR"
+
+# First-run: create venv if missing
+if [ ! -d ".venv" ]; then
+    echo '{"event":"first_run_setup","stage":"venv"}' >&1
+    uv venv --python 3.12 >&2
+    uv pip install mlx-audio numpy soundfile scipy >&2
+fi
+
+exec uv run python -m choicevoice_tts "$@"
