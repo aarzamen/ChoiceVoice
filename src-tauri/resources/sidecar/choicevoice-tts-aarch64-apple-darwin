@@ -3,17 +3,33 @@
 # Tauri appends the target-triple suffix; this is the aarch64-apple-darwin variant.
 set -euo pipefail
 
+# When launched from a bundled .app, macOS gives us the minimal PATH
+# /usr/bin:/bin:/usr/sbin:/sbin — no Homebrew. Prepend the common locations
+# where `uv` and `python` live so the rest of this script can find them.
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
 # Locate sidecar/ dir relative to this script (works both in dev and bundled)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# In dev: resources/sidecar/ lives inside src-tauri/resources/sidecar/
-# In bundled .app: Tauri copies externalBin next to the app binary
-# Walk up to find the sidecar/ Python project
+# Friendly error if uv isn't on PATH at all
+if ! command -v uv >/dev/null 2>&1; then
+    echo '{"event":"error","stage":"wrapper","message":"uv not found on PATH; install via brew install uv"}' >&1
+    exit 127
+fi
+
+# Search order:
+#   1. CHOICEVOICE_SIDECAR_DIR env var (explicit override)
+#   2. Relative to wrapper — works for `cargo tauri dev` (wrapper at
+#      src-tauri/target/{debug,release}/, sidecar/ two-three levels up)
+#   3. ~/Projects/ChoiceVoice/sidecar — works for the bundled .app on the
+#      dev machine where the source still lives. Day-one scope per CLAUDE.md.
 for candidate in \
+    "${CHOICEVOICE_SIDECAR_DIR:-/nonexistent}" \
     "$SCRIPT_DIR/../../../sidecar" \
     "$SCRIPT_DIR/../../sidecar" \
     "$SCRIPT_DIR/../sidecar" \
-    "$SCRIPT_DIR/sidecar"
+    "$SCRIPT_DIR/sidecar" \
+    "$HOME/Projects/ChoiceVoice/sidecar"
 do
     if [ -d "$candidate/choicevoice_tts" ]; then
         SIDECAR_DIR="$(cd "$candidate" && pwd)"
