@@ -119,10 +119,13 @@ Sidecar emits JSONL events on stdout:
 
 ## Known issues
 
-- Voice character drifts noticeably between chunks even with the same speaker
-  and settings. Inherent to the model's chunked inference (no cross-chunk
-  conditioning). Live with it for now; later, could try larger chunks or pass
-  a reference clip from chunk N-1 if the model supports it.
+- Voice still drifts slightly between chunks. The model architecture
+  (VyvoTTS/SNAC) has no reference-audio input, so cross-chunk context isn't
+  possible inside this model. Mitigation in place: per-speaker seeded RNG
+  (`mx.random.seed(_speaker_seed(speaker))`), tightened sampler
+  (`temperature=0.35, top_p=0.7`), and 120-word chunks instead of 80. For
+  fully consistent long-form, swap to a model that supports a reference clip
+  (F5-TTS, IndexTTS, XTTS).
 - DESIGN and CLONE modes are UI-only — no backend invocation yet.
 - The `web content process terminated` debug log on startup is normal WKWebView
   initialization noise.

@@ -90,7 +90,7 @@ def main() -> None:
             # Retry with smaller chunk (OOM fallback from spec §10)
             if "memory" in str(exc).lower() or "oom" in str(exc).lower():
                 emit({"event": "degraded_chunking"})
-                sub = _chunker.chunk_text(chunk, max_words=40)
+                sub = _chunker.chunk_text(chunk, max_words=60)
                 for j, sub_chunk in enumerate(sub):
                     try:
                         arr = _engine.generate(

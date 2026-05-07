@@ -5,7 +5,12 @@ import re
 _SENTENCE_RE = re.compile(r'(?<=[.!?])\s+(?=[A-Z"\'\(])|(?<=[.!?])\s*\n')
 _HARD_BREAK = re.compile(r'\n{2,}')
 
-MAX_WORDS = 80
+# 120 words is roughly 45-55 seconds of speech at 24kHz output. Stays inside
+# the model's stable generation window and halves the number of chunk
+# boundaries vs. the original 80-word limit, which directly reduces the
+# chunk-to-chunk voice-drift problem (the model has no cross-chunk audio
+# context, so every boundary is a place where prosody/accent can shift).
+MAX_WORDS = 120
 
 
 def _split_sentences(text: str) -> list[str]:

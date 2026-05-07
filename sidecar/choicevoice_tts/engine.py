@@ -49,6 +49,16 @@ _model = None           # mlx_audio model OR Qwen3TTSModel
 _processor = None       # only for torch path
 
 
+def _speaker_seed(speaker: str) -> int:
+    """Stable per-speaker RNG seed. Same speaker → same voice signature
+    across chunks, even within a single render. Hash collapsed to 31 bits
+    because mlx random.seed wants a non-negative int32-range value."""
+    h = 0
+    for ch in speaker:
+        h = (h * 131 + ord(ch)) & 0x7FFFFFFF
+    return h or 1
+
+
 def _try_mlx(model_id: str):
     """Return (model, BACKEND_MLX) or raise."""
     from mlx_audio.tts.utils import load_model
@@ -165,11 +175,20 @@ def _generate_mlx(text: str, speaker: str, language: str, style: str | None) -> 
     if style:
         voice = f"{speaker} ({style})"
 
+    # Cross-chunk consistency: VyvoTTS/SNAC architecture has no reference-audio
+    # input, so each chunk is sampled independently. Pinning the RNG to a per-
+    # speaker seed and tightening the sampler keeps the voice from drifting
+    # between chunks. Trade-off: very slightly less prosodic variation within
+    # each chunk. Worth it for narration that runs longer than one chunk.
+    seed = _speaker_seed(speaker)
+    mx.random.seed(seed)
+    np.random.seed(seed)
+
     results = list(_model.generate(
         text=prompt,
         voice=voice,
-        temperature=0.6,
-        top_p=0.9,
+        temperature=0.35,
+        top_p=0.7,
         max_tokens=2048,
         verbose=False,
     ))
