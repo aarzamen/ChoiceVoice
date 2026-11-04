@@ -116,4 +116,10 @@ Model weights live in the Hugging Face cache at `~/.cache/huggingface/hub/`.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+ChoiceVoice is released under the MIT License. See [LICENSE](LICENSE).
+
+Third-party components keep their own licences and are not covered by that file:
+
+- The Qwen3-TTS model weights (`mlx-community/Qwen3-TTS-12Hz-1.7B-Base-8bit`, the 0.6B variant, and the `Qwen/Qwen3-TTS-12Hz-*-CustomVoice` fallback) are downloaded from Hugging Face at first run. Their authors publish them under Apache-2.0. They are not part of this repository.
+- Python, Rust and npm dependencies are under permissive licences (MIT, Apache-2.0, BSD, ISC, MPL-2.0, Unicode, PSF). `soundfile` ships libsndfile, which is LGPL-2.1-or-later and is used unmodified as a shared library.
+- The fonts VT323, Share Tech Mono and Bebas Neue are loaded from Google Fonts at runtime under the SIL Open Font License. They are not bundled.
